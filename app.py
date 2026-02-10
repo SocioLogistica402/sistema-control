@@ -1,4 +1,40 @@
 import streamlit as st
+
+# --- CONFIGURACIÓN DE SEGURIDAD ---
+def check_password():
+    """Devuelve True si el usuario ingresó la contraseña correcta."""
+
+    def password_entered():
+        """Revisa si la contraseña coincide."""
+        if st.session_state["username"] == "admin" and st.session_state["password"] == "Socio2024*":
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Borramos la contraseña de memoria por seguridad
+            del st.session_state["username"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # Pantalla de Login
+        st.title("🔐 Acceso Restringido")
+        st.text_input("Usuario", key="username")
+        st.text_input("Contraseña", type="password", key="password")
+        st.button("Entrar", on_click=password_entered)
+        return False
+    elif not st.session_state["password_correct"]:
+        # Credenciales incorrectas
+        st.title("🔐 Acceso Restringido")
+        st.text_input("Usuario", key="username")
+        st.text_input("Contraseña", type="password", key="password")
+        st.button("Entrar", on_click=password_entered)
+        st.error("😕 Usuario o contraseña incorrectos")
+        return False
+    else:
+        # Contraseña correcta
+        return True
+
+# --- SI LA CONTRASEÑA ES CORRECTA, CORRE EL RESTO DE LA APP ---
+if check_password():
+import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
@@ -95,3 +131,5 @@ elif seccion == "📊 Reportes y Gráficas":
     with c2:
         st.subheader("Insumos en Stock")
         st.bar_chart(df_ins.set_index('Producto')['Cantidad'])
+
+    st.success("¡Bienvenido, Socio!")
